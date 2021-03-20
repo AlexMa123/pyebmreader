@@ -14,7 +14,6 @@ date: 3.20.2021
 """
 import numpy as np
 from struct import unpack
-import pandas as pd
 import datetime
 
 # parameter define
