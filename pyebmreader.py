@@ -5,7 +5,7 @@ Embla file reader from python
 
 This script is a python version of : https://github.com/gpiantoni/hgse_private/blob/master/ebmread.m
 
-Version 0.2
+Version 0.21
 
 Author: Yaopeng Ma    mayaope@biu.ac.il
 
@@ -64,7 +64,7 @@ def cal_stoptime(starttime, deltat):
     return starttime + dt
 
 
-def ebmreader(filepath):
+def ebmreader(filepath, onlyheader=False):
 
     with open(filepath, "rb") as f:
 
@@ -158,10 +158,13 @@ def ebmreader(filepath):
 
             # read data
             if rec == int.from_bytes(EBM_R_DATA, endian):
-                newdata = f.read(recSize * SIZE_int16 // 2)
-                newdata = np.frombuffer(newdata, np.int16)
-                newdata = newdata * header["unitgain"]
-                data.append(newdata)
+                if onlyheader == False:
+                    newdata = f.read(recSize)
+                    newdata = np.frombuffer(newdata, np.int16)
+                    newdata = newdata * header["unitgain"]
+                    data.append(newdata)
+                else:
+                    f.seek(recSize, 1)
                 current = header["starttime"][recnum]
                 header["stoptime"].append(
                     cal_stoptime(current, recSize / 2 / header["frequency"]))
@@ -182,11 +185,12 @@ def ebmreader(filepath):
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     data, header = ebmreader(
-        r"C:\Users\45805\OneDrive\workspace\my_porject\2nd year\pyembreader\SL012\Plethysmogram.ebm"
-    )
-    print(header["sec_error"])
+        r"C:\Users\45805\OneDrive\workspace\my_porject\2nd year\pyembreader\SL012\Plethysmogram.ebm",
+        onlyheader=True)
+    print(header["starttime"])
     print(header["length"])
+    print(data)
 
-    plt.figure()
-    plt.plot(data[-1][:])
-    plt.show()
+    # plt.figure()
+    # plt.plot(data[-1][:])
+    # plt.show()
