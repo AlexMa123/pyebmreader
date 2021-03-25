@@ -65,9 +65,7 @@ def cal_stoptime(starttime, deltat):
 
 
 def ebmreader(filepath, onlyheader=False):
-
     with open(filepath, "rb") as f:
-
         header = {}
         signature = []
         signature.append(f.read(SIZE_char))
@@ -76,7 +74,7 @@ def ebmreader(filepath, onlyheader=False):
                 -1] != EBM_END_OF_SIGNATURE and i < EBM_MAX_SIGNATURE_SIZE - 1:
             i = i + 1
             signature.append(f.read(SIZE_char))
-        signature = "".join(map(lambda x: x.decode(), signature))
+        signature = "".join(map(lambda x: x.decode("windows-1252"), signature))
 
         assert i != EBM_MAX_SIGNATURE_SIZE - 1, ERROR_UNKNOWN_SIGNATURE
         assert EBM_RAWDATA_HEADER in signature, ERROR_UNKNOWN_SIGNATURE
@@ -144,7 +142,7 @@ def ebmreader(filepath, onlyheader=False):
                 header["channel"] = unpack_one("h", f.read(SIZE_int16), endian)
 
             if rec == int.from_bytes(EBM_R_SAMPLING_RATE, endian):
-                header["frequency"] = unpack_one("l", f.read(SIZE_long),
+                header["frequency"] = unpack_one("L", f.read(SIZE_long),
                                                  endian) / 1000
             if rec == int.from_bytes(EBM_R_RATECORR, endian):
                 header["sec_error"] = unpack_one("d", f.read(8), endian)
@@ -158,7 +156,7 @@ def ebmreader(filepath, onlyheader=False):
 
             # read data
             if rec == int.from_bytes(EBM_R_DATA, endian):
-                if onlyheader == False:
+                if onlyheader is False:
                     newdata = f.read(recSize)
                     newdata = np.frombuffer(newdata, np.int16)
                     newdata = newdata * header["unitgain"]
