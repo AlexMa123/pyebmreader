@@ -93,6 +93,14 @@ def load_header(filepath):
     """
     f = open(filepath, "rb")
     headers = pickle.load(f)
+    german_c = ["ä", "ö", "ü", "ß",  "Ä", "Ü", "Ö"]
+    english_c = ["a", "o", "v", "b", "A", "U", "O"]
+    for i, name in enumerate(headers["channels"]):
+        for g, e in zip(german_c, english_c):
+            name = name.replace(g, e)
+            if len(name) >= 17:
+                name = name[:16]
+        headers["channels"][i] = name
     f.close()
     return headers
 
@@ -151,6 +159,9 @@ def correct_signal(signal,
         start_index = round(time_diff.total_seconds() * freq)
         end_index = length + start_index
 
+        if end_index <= 0 or start_index >= len(signal):
+            continue
+
         start_index = max(0, start_index)
         end_index = min(len(signal), end_index)
 
@@ -173,6 +184,8 @@ def correct_signal(signal,
         x = (-(x - x[0]) * sec_error + x)
         t.append(x)
         real_signal.append(y)
+    if len(t) == 0:
+        return signal
     t = np.concatenate(t)
     real_signal = np.concatenate(real_signal)
     interpolate_f = interp1d(t,
