@@ -180,7 +180,8 @@ def correct_signal(signal,
                              bounds_error=False,
                              fill_value=0,
                              assume_sorted=True)
-    resampled_t = np.arange(ceil(t[-1] / 100) * 100)
+    last_t = int(t[-1] / freq) * freq
+    resampled_t = np.arange(int(last_t))
     return interpolate_f(resampled_t)
 
 
