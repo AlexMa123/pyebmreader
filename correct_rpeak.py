@@ -80,7 +80,7 @@ def correct_rposition(rposition, freq, rposition_starttime, ebm_header):
             while not start_i[j] <= rposition[i] < end_i[j]:
                 j += 1
             rposition_tmp = rposition[i] - (rposition[i] - start_i[j]) * rate_correction
-            correct_rposition[i] = int(rposition_tmp)
+            correct_rposition[i] = round(rposition_tmp)
         return correct_rposition
 
     find_ecg = False
